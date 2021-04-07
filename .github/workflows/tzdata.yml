@@ -5,6 +5,9 @@ jobs:
   build-job:
     name: build source code
     runs-on: ubuntu-latest
+    env:
+      VERSION: 2021a
+
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -13,4 +16,11 @@ jobs:
 
       - name: build
         run: |
-          /usr/bin/bash build.sh
+          /usr/bin/bash build.sh ${VERSION}
+          ls -Al ${GITHUB_WORKSPACE}/${VERSION}_zoneinfo.zip
+
+      - name: upload
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{env.VERSION}}.zip
+          path: ${{github.workspace}}/${{env.VERSION}}.zip
