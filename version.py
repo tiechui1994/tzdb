@@ -59,9 +59,11 @@ def get_tzdata_last_version() -> str:
 if __name__ == '__main__':
     version = get_tzdata_last_version()
     release = get_release_last_version()
-
-    if version == release:
+    content = ''
+    if version != release:
         out = os.popen('bash build.sh %s' % (version,))
         print(str(out.read()))
-        with open("/tmp/version", mode='w+') as fd:
-            fd.write(version)
+        content = version
+
+    with open("/tmp/version", mode='w+') as fd:
+        fd.write(content)

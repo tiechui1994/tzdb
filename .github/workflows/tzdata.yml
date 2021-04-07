@@ -5,36 +5,36 @@ jobs:
   build-job:
     name: build source code
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.build.outputs.version }}
 
     steps:
-      - name: checkout
+      - name: checkout code
         uses: actions/checkout@v2
         with:
           persist-credentials: false
 
-      - name: build
+      - id: build
+        name: build code
         run: |
           python3 version.py
-          echo $(cat /tmp/version)
-          echo "::set-output name=version::$(echo $(cat /tmp/version))"
+          VERSION="$(cat /tmp/version)"
+          echo "::set-output name=version::$VERSION"
+          echo "${{ steps.build.outputs.version }}"
         shell: bash
 
-
-      - name: upload
-#        if: ${{ steps.build.outputs.version }}
+      - name: upload tzdata
+        if: ${{ steps.build.outputs.version }}
         uses: actions/upload-artifact@master
         with:
           name: ${{steps.build.outputs.version}}_zoneinfo.zip
           path: ${{github.workspace}}/${{steps.build.outputs.version}}_zoneinfo.zip
 
-#      - name: release
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.TOKEN }}
-#          file: ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
-#          asset_name: ${{env.VERSION}}_zoneinfo.zip
-#          tag: ${{env.VERSION}}
-#          overwrite: true
-#          body: "release ${{env.VERSION}}"
+      - name: release version
+        if: ${{ steps.build.outputs.version }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          file: ${{github.workspace}}/${{steps.build.outputs.version}}_zoneinfo.zip
+          asset_name: ${{steps.build.outputs.version}}_zoneinfo.zip
+          tag: ${{steps.build.outputs.version}}
+          overwrite: true
+          body: "release ${{steps.build.outputs.version}}"
