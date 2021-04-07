@@ -1,5 +1,7 @@
 name: Build tzdata
-on: push
+on:
+  schedule:
+    - cron: '*/30 12 * * *'
 
 jobs:
   build-job:
@@ -18,7 +20,7 @@ jobs:
           python3 version.py
           VERSION="$(cat /tmp/version)"
           echo "::set-output name=version::$VERSION"
-          echo "${{ steps.build.outputs.version }}"
+          echo "version: ${{ steps.build.outputs.version }}"
         shell: bash
 
       - name: upload tzdata
