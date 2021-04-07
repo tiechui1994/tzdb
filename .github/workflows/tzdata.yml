@@ -22,5 +22,15 @@ jobs:
       - name: upload
         uses: actions/upload-artifact@master
         with:
-          name: ${{env.VERSION}}.zip
-          path: ${{github.workspace}}/${{env.VERSION}}.zip
+          name: ${{env.VERSION}}_zoneinfo.zip
+          path: ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
+
+      - name: release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          file: ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
+          asset_name: ${{env.VERSION}}_zoneinfo.zip
+          tag: ${{env.VERSION}}
+          overwrite: true
+          body: "release ${{env.VERSION}}"
