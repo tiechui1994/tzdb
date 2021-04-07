@@ -1,4 +1,4 @@
-name: Build tzdata
+name: generate tzdb
 on:
   schedule:
     - cron: '*/30 12 * * *'
@@ -23,7 +23,7 @@ jobs:
           echo "version: ${{ steps.build.outputs.version }}"
         shell: bash
 
-      - name: upload tzdata
+      - name: upload tzdb
         if: ${{ steps.build.outputs.version }}
         uses: actions/upload-artifact@master
         with:
@@ -39,4 +39,4 @@ jobs:
           asset_name: ${{steps.build.outputs.version}}_zoneinfo.zip
           tag: ${{steps.build.outputs.version}}
           overwrite: true
-          body: "release ${{steps.build.outputs.version}}"
+          body: "release tzdb ${{steps.build.outputs.version}}"

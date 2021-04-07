@@ -6,25 +6,8 @@ import requests
 endpoint = "https://api.github.com"
 
 
-def set_env(key, value: str):
-    u = endpoint + "/repos/tiechui1994/tzdata/environments/%s" % (key,)
-    header = {
-        'Accept': 'application/vnd.github.v3+json'
-    }
-    body = {
-        'wait_timer': 0,
-    }
-    response = requests.request("PUT", url=u, headers=header, data=body)
-    if response.status_code == 200:
-        result = json.JSONDecoder().decode(str(response.content, 'utf-8'))
-        if len(result) > 0:
-            return result[0].get('tag_name')
-
-    return ''
-
-
 def get_release_last_version() -> str:
-    u = endpoint + "/repos/tiechui1994/tzdata/releases"
+    u = endpoint + "/repos/tiechui1994/tzdb/releases"
     header = {
         'Accept': 'application/vnd.github.v3+json'
     }
@@ -41,7 +24,7 @@ def get_release_last_version() -> str:
     return ''
 
 
-def get_tzdata_last_version() -> str:
+def get_tz_last_version() -> str:
     u = "https://www.iana.org/time-zones"
     header = {
         'Accept': 'text/html'
@@ -57,7 +40,7 @@ def get_tzdata_last_version() -> str:
 
 
 if __name__ == '__main__':
-    version = get_tzdata_last_version()
+    version = get_tz_last_version()
     release = get_release_last_version()
     content = ''
     if version != release:
