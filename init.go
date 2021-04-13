@@ -12,8 +12,11 @@ import (
 
 func init() {
 	log.SetPrefix("<tzdb> ")
-	go job()
+	initAsyncJob()
+	time.Now().Zone()
 }
+
+var zonefile = "/tmp/zoneinfo.zip"
 
 func download() (err error) {
 	u := "https://api.github.com/repos/tiechui1994/tzdb/releases/latest"
@@ -46,8 +49,7 @@ func download() (err error) {
 	}
 	defer response.Body.Close()
 
-	tmp := "/tmp/zoneinfo.zip"
-	fd, err := os.Open(tmp)
+	fd, err := os.Open(zonefile)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -55,7 +57,7 @@ func download() (err error) {
 
 	_, err = io.Copy(fd, response.Body)
 	if err != nil {
-		os.Remove(tmp)
+		os.Remove(zonefile)
 		log.Println(err)
 		return err
 	}
@@ -63,17 +65,16 @@ func download() (err error) {
 	return nil
 }
 
-// 更新夏令时
-func job() {
-	filename := "/tmp/zoneinfo.zip"
-	if _, err := os.Open(filename); err != nil && os.IsNotExist(err) {
+// update zoneinfo information
+func initAsyncJob() {
+	if _, err := os.Open(zonefile); err != nil && os.IsNotExist(err) {
 		err = download()
 		if err != nil {
 			return
 		}
 	}
 
-	syscall.Setenv("ZONEINFO", filename)
+	syscall.Setenv("ZONEINFO", zonefile)
 
 	now := time.Now()
 	y, m, d := now.Date()
@@ -83,13 +84,15 @@ func job() {
 		after = time.Date(y, m, d, 0, 0, 0, 0, time.Local).Sub(now)
 	}
 
-	time.Sleep(after)
+	go func() {
+		time.Sleep(after)
 
-	ticker := time.NewTicker(time.Hour * 24)
-	for {
-		select {
-		case <-ticker.C:
-			go download()
+		ticker := time.NewTicker(time.Hour * 24)
+		for {
+			select {
+			case <-ticker.C:
+				go download()
+			}
 		}
-	}
+	}()
 }

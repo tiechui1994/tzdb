@@ -7,10 +7,6 @@ import (
 	"unsafe"
 )
 
-func init() {
-	time.Now().Zone()
-}
-
 type Location struct {
 	name string
 	zone []zone
