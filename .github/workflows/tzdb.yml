@@ -1,8 +1,7 @@
 name: generate tzdb
-#on:
-#  schedule:
-#    - cron: '*/30 12 * * *'
-on: push
+on:
+  schedule:
+    - cron: '0 12 * * *'
 
 jobs:
   build-job:
