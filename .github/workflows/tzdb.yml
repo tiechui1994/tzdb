@@ -1,7 +1,8 @@
 name: generate tzdb
-on:
-  schedule:
-    - cron: '*/30 12 * * *'
+#on:
+#  schedule:
+#    - cron: '*/30 12 * * *'
+on: push
 
 jobs:
   build-job:
@@ -17,7 +18,7 @@ jobs:
       - id: build
         name: build code
         run: |
-          python3 version.py
+          python3 scripts/version.py
           VERSION="$(cat /tmp/version)"
           echo "::set-output name=version::$VERSION"
           echo "version: ${{ steps.build.outputs.version }}"
