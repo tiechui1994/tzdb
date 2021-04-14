@@ -1,5 +1,4 @@
 import json
-import os
 import re
 import requests
 
@@ -11,7 +10,6 @@ def get_release_last_version() -> str:
     header = {
         'Accept': 'application/vnd.github.v3+json'
     }
-    print(u)
     response = requests.request("GET", url=u, headers=header, timeout=120)
     print(response.status_code)
     if response.status_code == 200:
@@ -40,9 +38,8 @@ if __name__ == '__main__':
     version = get_tz_last_version()
     release = get_release_last_version()
     content = ''
+    print('version: %s, release: %s' % (version, release))
     if version != release:
-        out = os.popen('bash build.sh %s' % (version,))
-        print(str(out.read()))
         content = version
 
     with open("/tmp/version", mode='w+') as fd:

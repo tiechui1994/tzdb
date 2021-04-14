@@ -5,9 +5,10 @@ name: generate tzdb
 on: push
 
 jobs:
-  build-job:
-    name: build source code
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.version.outputs.VERSION }}
 
     steps:
       - name: checkout code
@@ -15,29 +16,51 @@ jobs:
         with:
           persist-credentials: false
 
-      - id: build
-        name: build code
+      - id: version
+        name: get version
         run: |
           python3 scripts/version.py
           VERSION="$(cat /tmp/version)"
-          echo "::set-output name=version::$VERSION"
-          echo "version: ${{ steps.build.outputs.version }}"
+          echo "tmp file version: $VERSION"
+          echo "::set-output name=VERSION::$VERSION"
         shell: bash
 
+  build:
+    runs-on: ubuntu-latest
+    needs: [setup]
+    env:
+      VERSION: ${{ needs.setup.outputs.VERSION }}
+
+    steps:
+      - name: clone tzdata
+        if: ${{ env.VERSION }}
+        uses: actions/checkout@v2
+        with:
+          repository: eggert/tz
+          ref: ${{ env.VERSION }}
+
+      - name: build tzdata
+        if: ${{ env.VERSION }}
+        run: |
+          make TOPDIR=data install
+          cd data/usr/share/zoneinfo && zip -0 -r zoneinfo.zip *
+          mv zoneinfo.zip ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
+          ls -lh ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
+
       - name: upload tzdb
-        if: ${{ steps.build.outputs.version }}
+        if: ${{ env.VERSION }}
         uses: actions/upload-artifact@master
         with:
-          name: ${{steps.build.outputs.version}}_zoneinfo.zip
-          path: ${{github.workspace}}/${{steps.build.outputs.version}}_zoneinfo.zip
+          name: ${{env.VERSION}}_zoneinfo.zip
+          path: ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
 
       - name: release version
-        if: ${{ steps.build.outputs.version }}
+        if: ${{ env.VERSION }}
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.TOKEN }}
-          file: ${{github.workspace}}/${{steps.build.outputs.version}}_zoneinfo.zip
-          asset_name: ${{steps.build.outputs.version}}_zoneinfo.zip
-          tag: ${{steps.build.outputs.version}}
+          file: ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
+          asset_name: ${{env.VERSION}}_zoneinfo.zip
+          tag: ${{env.VERSION}}
           overwrite: true
-          body: "release tzdb ${{steps.build.outputs.version}}"
+          body: "release tzdb ${{env.VERSION}}"
