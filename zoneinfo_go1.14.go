@@ -1,4 +1,4 @@
-//+build go1.14,!go1.17
+//+build go1.14
 
 package tzdb
 

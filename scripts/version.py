@@ -1,25 +1,22 @@
 import json
-import re
 import os
+import re
 import requests
 
 endpoint = "https://api.github.com"
 
 
 def get_release_last_version() -> str:
-    u = endpoint + "/repos/tiechui1994/tzdb/releases"
+    u = endpoint + "/repos/tiechui1994/tzdb/releases/latest"
     header = {
         'Accept': 'application/vnd.github.v3+json'
     }
-    params = {
-        'per_page': 100,
-        'page': 0,
-    }
-    response = requests.request("GET", url=u, headers=header, params=params)
+    print(u)
+    response = requests.request("GET", url=u, headers=header, timeout=120)
+    print(response.status_code)
     if response.status_code == 200:
         result = json.JSONDecoder().decode(str(response.content, 'utf-8'))
-        if len(result) > 0:
-            return result[0].get('tag_name')
+        return result.get('tag_name')
 
     return ''
 
