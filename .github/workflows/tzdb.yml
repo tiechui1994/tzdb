@@ -1,8 +1,7 @@
 name: generate tzdb
-#on:
-#  schedule:
-#    - cron: '0 12 * * *'
-on: push
+on:
+  schedule:
+    - cron: '0 12 * * *'
 
 jobs:
   setup:
@@ -43,7 +42,7 @@ jobs:
         if: ${{ env.VERSION }}
         run: |
           make TOPDIR=data install
-          cd data/usr/share/zoneinfo && zip -0 -r zoneinfo.zip *
+          cd data/usr/share && zip zoneinfo.zip zoneinfo
           mv zoneinfo.zip ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
           ls -lh ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
 
