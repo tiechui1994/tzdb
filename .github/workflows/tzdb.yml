@@ -34,20 +34,15 @@ jobs:
       VERSION: ${{ needs.setup.outputs.VERSION }}
 
     steps:
-      - name: clone tzdata
-        if: ${{ env.VERSION }}
+      - name: checkout code
         uses: actions/checkout@v2
         with:
-          repository: eggert/tz
-          ref: ${{ env.VERSION }}
+          persist-credentials: false
 
       - name: build tzdata
         if: ${{ env.VERSION }}
         run: |
-          make TOPDIR=data install
-          cd data/usr/share && zip -0 -r zoneinfo.zip zoneinfo
-          mv zoneinfo.zip ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
-          ls -lh ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
+          bash scripts/build.sh ${{env.VERSION}}
 
       - name: upload tzdb
         if: ${{ env.VERSION }}

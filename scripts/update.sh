@@ -13,4 +13,4 @@ wget --continue --quiet ${url} -O /tmp/zoneinfo.zip
 rm -rf /tmp/zoneinfo && mkdir /tmp/zoneinfo \
 unzip -d /tmp/zoneinfo /tmp/zoneinfo.zip
 
-mv /tmp/zoneinfo /usr/share/zoneinfo
+mv /tmp/zoneinfo/zoneinfo /usr/share/zoneinfo
