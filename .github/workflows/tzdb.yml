@@ -1,11 +1,14 @@
 name: generate tzdb
 on:
+  push:
+    branches: main
   schedule:
     - cron: '0 12 * * *'
 
+
 jobs:
   setup:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     outputs:
       VERSION: ${{ steps.version.outputs.VERSION }}
 
@@ -25,7 +28,7 @@ jobs:
         shell: bash
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     needs: [setup]
     env:
       VERSION: ${{ needs.setup.outputs.VERSION }}
@@ -42,7 +45,7 @@ jobs:
         if: ${{ env.VERSION }}
         run: |
           make TOPDIR=data install
-          cd data/usr/share && zip zoneinfo.zip zoneinfo
+          cd data/usr/share && zip -0 -r zoneinfo.zip zoneinfo
           mv zoneinfo.zip ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
           ls -lh ${{github.workspace}}/${{env.VERSION}}_zoneinfo.zip
 
