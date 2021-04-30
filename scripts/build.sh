@@ -32,7 +32,7 @@ chmod -Rf a+rX,u+w,g-w,o-w .
 
 make VERSION="$version" "tzdata$version-rearguard.tar.gz"
 
-tar zxf "tzdata$version-rearguard.tar.gz"
+tar xvf "tzdata$version-rearguard.tar.gz"
 
 rm tzdata.zi
 make VERSION="$version" DATAFORM=rearguard tzdata.zi
