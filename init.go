@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	log.SetPrefix("<tzdb> ")
+	log.SetPrefix("tzdb ")
 	initAsyncJob()
 	time.Now().Zone()
 }
